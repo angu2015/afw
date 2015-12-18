@@ -1,0 +1,31 @@
+<assembly>
+    <id>jmeter</id>
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <baseDirectory>ph_automation</baseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/jmeter</directory>
+      <lineEnding>keep</lineEnding>
+      <filtered>false</filtered>
+      <outputDirectory>./jmeter</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet> 
+   <fileSet>
+      <directory>src/main/resources</directory>
+      <lineEnding>keep</lineEnding>
+      <filtered>false</filtered>
+      <outputDirectory>./resources</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet> 	
+  </fileSets>
+</assembly>

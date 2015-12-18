@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.6" jmeter="2.11 r1554548">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1427005372000</longProp>
+        <longProp name="ThreadGroup.end_time">1427005372000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+          <collectionProp name="Arguments.arguments">
+            <elementProp name="XSL_FILE" elementType="Argument">
+              <stringProp name="Argument.name">XSL_FILE</stringProp>
+              <stringProp name="Argument.value">resources/jmeter-results-detail-report_phat.xsl</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="XML_FILE" elementType="Argument">
+              <stringProp name="Argument.name">XML_FILE</stringProp>
+              <stringProp name="Argument.value">${__P(XML_FILE)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="HTML_FILE" elementType="Argument">
+              <stringProp name="Argument.name">HTML_FILE</stringProp>
+              <stringProp name="Argument.value">${__P(HTML_FILE)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="DATE_FORMAT" elementType="Argument">
+              <stringProp name="Argument.name">DATE_FORMAT</stringProp>
+              <stringProp name="Argument.value">${__P(DATE_FORMAT)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+            <elementProp name="TAG_NAMES" elementType="Argument">
+              <stringProp name="Argument.name">TAG_NAMES</stringProp>
+              <stringProp name="Argument.value">${__P(TAG_NAMES)}</stringProp>
+              <stringProp name="Argument.metadata">=</stringProp>
+            </elementProp>
+          </collectionProp>
+        </Arguments>
+        <hashTree/>
+        <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="BeanShell Sampler" enabled="true">
+          <stringProp name="BeanShellSampler.query">import java.io.File;
+import java.io.FileOutputStream;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+
+import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+  try {
+	String tagNames = &quot;${TAG_NAMES}&quot;;
+	if(tagNames == null || tagNames == &quot;&quot; || tagNames == &quot;1&quot;) {
+		tagNames = &quot;TESTCASE_DESCRIPTION,STEP_DESCRIPTION,STEP_SEVERITY,VALIDATIONS,VALIDATION,NAME,DESCRIPTION,EXPECTED_RESULT,ACTUAL_RESULT,VALIDATION_RESULT,TESTCASE_SEVERITY,DEVELOPER_LOGS&quot;;
+	}
+	String xmlString = FileUtils.readFileToString(new File(&quot;${XML_FILE}&quot;));
+	if(!xmlString.trim().endsWith(&quot;&lt;/testResults&gt;&quot;)){
+		xmlString = xmlString + &quot;\n&lt;/testResults&gt;&quot;;
+	}
+	String[] tags = tagNames.split(&quot;,&quot;);
+	for (int i = 0; i &lt; tags.length; i++) {
+		String startTag = &quot;&amp;lt;&quot;+tags[i]+&quot;&amp;gt;&quot;;
+		String startTagNew = &quot;&lt;&quot;+tags[i]+&quot;&gt;&quot;;
+		xmlString = xmlString.replaceAll(startTag, startTagNew);
+		
+		String endTag = &quot;&amp;lt;/&quot;+tags[i]+&quot;&amp;gt;&quot;;
+		String endTagNew = &quot;&lt;/&quot;+tags[i]+&quot;&gt;&quot;;
+		xmlString = xmlString.replaceAll(endTag, endTagNew);
+	}
+
+	//For Failure Log link
+	String startLinkTag = &quot;&amp;lt;a href=&amp;quot;&quot;;
+		String startLinkTagNew = &quot;&lt;a href=\&quot;&quot;;
+		xmlString = xmlString.replaceAll(startLinkTag, startLinkTagNew);
+		
+		String endLinkTag = &quot;&amp;quot;&amp;gt;Log&amp;lt;/a&amp;gt&quot;;
+		String endLinkTagNew = &quot;\&quot;&gt;Log&lt;/a&gt;&quot;;
+		xmlString = xmlString.replaceAll(endLinkTag, endLinkTagNew);
+	
+    TransformerFactory tFactory = TransformerFactory.newInstance();
+
+    Transformer transformer = tFactory.newTransformer
+    		(new javax.xml.transform.stream.StreamSource(&quot;${XSL_FILE}&quot;));
+
+	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+	DocumentBuilder builder = factory.newDocumentBuilder();
+	//Document document = builder.parse(&quot;${XML_FILE}&quot;);
+	InputSource is = new InputSource();
+	is.setCharacterStream(new StringReader(xmlString));
+	Document document = builder.parse(is);
+	NodeList samples = document.getElementsByTagName(&quot;sample&quot;);
+
+	if(samples.getLength() &gt; 0) {
+		Node sample = samples.item(0);
+		Element element = (Element) sample;
+		TimeZone tz = Calendar.getInstance().getTimeZone();
+		element.setAttribute(&quot;timeZone&quot;, tz.getDisplayName() + &quot; - &quot; + tz.getID());
+	}
+	
+	try {
+		for(int i = 0; i &lt; samples.getLength(); i++) {
+			Node sample = samples.item(i);
+			Element element = (Element) sample;
+
+			String millisecs = element.getAttribute(&quot;ts&quot;);
+			String duration = element.getAttribute(&quot;t&quot;);
+			SimpleDateFormat format = new SimpleDateFormat(&quot;yyyy/MM/dd HH:mm:ss&quot;);
+
+			Date startDate = new Date(Long.parseLong(millisecs, 10));
+			String startTs = format.format(startDate);
+
+			Date endDate = new Date(Long.parseLong(millisecs, 10) + Long.parseLong(duration, 10));
+			String endTs = format.format(endDate);
+
+			element.setAttribute(&quot;startTs&quot;, startTs);
+			element.setAttribute(&quot;endTs&quot;, endTs);
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+	
+    transformer.transform
+      (new DOMSource(document),
+       new javax.xml.transform.stream.StreamResult( new FileOutputStream(&quot;${HTML_FILE}&quot;)));
+    }
+  catch (Exception e) {
+    e.printStackTrace( );
+    }</stringProp>
+          <stringProp name="BeanShellSampler.filename"></stringProp>
+          <stringProp name="BeanShellSampler.parameters"></stringProp>
+          <boolProp name="BeanShellSampler.resetInterpreter">false</boolProp>
+        </BeanShellSampler>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>true</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>true</responseHeaders>
+              <requestHeaders>true</requestHeaders>
+              <responseDataOnError>true</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <objProp>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>true</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>false</fieldNames>
+              <responseHeaders>true</responseHeaders>
+              <requestHeaders>true</requestHeaders>
+              <responseDataOnError>true</responseDataOnError>
+              <saveAssertionResultsFailureMessage>false</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <fileName>true</fileName>
+              <threadCounts>true</threadCounts>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

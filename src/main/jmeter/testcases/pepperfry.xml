@@ -1,0 +1,37 @@
+<steps>
+	<url name="Lauch URL" description="PepperFry Login" severity="Blocker">
+		<parameter name="URL"   value="http://www.pepperfry.com"/>
+	</url>
+	<step type="JAVA" name="Login" description="PepperFry Login" severity="Blocker">
+		<component name="link"   action="click"      xpath="//*[@id='loginPopupLink']" />
+		<component name="textbox"  action="entervalue" xpath="//*[@id='emailid']" value="sowmya.9991@gmail.com"/>
+		<component name="textbox"  action="entervalue" xpath="//*[@id='password']" value="admin1234" />
+		<component name="button" action="click" xpath="//*[@id='popup_login_form']"  />
+		<component name="timer" value="10" />
+	</step>	
+	
+	<step type="JAVA" name="Verify Furniture tab and its components" description="Check Parameters" severity="Blocker">
+		<component name=""  action="element-availability" xpath="//a[normalize-space()='Furniture']" saveTo="furnitureAvailability" compareWith="Element present" valdesc="Check Element availability" valkey="Presence"/>
+		<component name="link"   action="click"   xpath="//a[normalize-space()='Furniture']" />
+		<component name="timer" value="2" />
+		<component name=""  action="element-availability" xpath="//a[normalize-space()='Home Decor']" saveTo="homeDecorAvailability" compareWith="Element present" valdesc="Check Element availability" valkey="Presence"/>
+		<component name="link"   action="click"   xpath="//a[normalize-space()='Home Decor']" />
+		<component name="timer" value="2" />
+		<component name=""  action="element-availability" xpath="//a[normalize-space()='Furnishings']" saveTo="furnitureAvailability" compareWith="Element present" valdesc="Check Element availability" valkey="Presence"/>
+		<component name="link"   action="click"   xpath="//a[normalize-space()='Furnishings']" />
+		<component name="timer" value="2" />
+		<component name=""  action="element-availability" xpath="//a[normalize-space()='Appliances']" saveTo="furnitureAvailability" compareWith="Element present" valdesc="Check Element availability" valkey="Presence"/>
+		<component name="link"   action="click"   xpath="//a[normalize-space()='Appliances']" />
+		<component name="timer" value="2" />
+		<component name=""  action="element-availability" xpath="//a[normalize-space()='Housekeeping']" saveTo="furnitureAvailability" compareWith="Element present" valdesc="Check Element availability" valkey="Presence"/>
+		<component name="link"   action="click"   xpath="//a[normalize-space()='Housekeeping']" />
+		<component name="timer" value="2" />
+	</step>
+	
+	<step type="JAVA" name="Logout" description="PepperFry Logout" severity="Blocker">
+		<component name="link"   action="click"      xpath="//a[normalize-space()='Hi Sowmya']" />
+		<component name="timer" value="2" />
+		<component name="button" action="click" xpath="//a[normalize-space()='Logout']"  />
+	</step>
+	
+	</steps>

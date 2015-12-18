@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.8" jmeter="2.13 r1665067">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments"></stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="${__P(xmlScriptFileName)}" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1450440316000</longProp>
+        <longProp name="ThreadGroup.end_time">1450440316000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="Initializer" enabled="true">
+          <stringProp name="BeanShellSampler.query">import org.openqa.selenium.By;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPath;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+import org.apache.jmeter.samplers.SampleResult;
+import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+StringBuffer output = new StringBuffer(&quot;&quot;);
+SampleResult.setDataType(org.apache.jmeter.samplers.SampleResult.TEXT);
+
+
+
+try {
+	System.out.println(&quot;Parser Start&quot;);
+	Document document = null;
+	DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	System.out.println(&quot;Parser Start2&quot;);
+	document = dBuilder.parse(new File(&quot;testcases/${__P(xmlScriptFileName)}.xml&quot;));
+	vars.putObject(&quot;XML_DOCUMENT&quot;, document);
+System.out.println(&quot;Parser Start3&quot;);
+//Driver loader
+
+	WebDriver driver = null;
+	driver = new FirefoxDriver();	
+	System.out.println(&quot;Parser Start42232321&quot;);
+	
+	System.out.println(&quot;Parser Start4111&quot;);
+	driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+	driver.manage().window().maximize();
+	System.out.println(&quot;Parser Start4&quot;);
+	XPath mainXPathObject =  XPathFactory.newInstance().newXPath();
+	String mainXpath = &quot;/steps/url/parameter&quot;;
+	NodeList steps = (NodeList) mainXPathObject.compile(mainXpath).evaluate(document, XPathConstants.NODESET);
+	Node parameter = steps.item(0);
+		String name = parameter.getAttributes().getNamedItem(&quot;name&quot;).getTextContent();
+		String value = parameter.getAttributes().getNamedItem(&quot;value&quot;).getTextContent(); 
+		System.out.println(&quot;==========Preprocessor for Step Number name : : &quot; + name + &quot; ..... &quot; + value);
+		
+	driver.get(value);	
+	vars.putObject(&quot;DRIVER&quot;, driver);
+	props.put(&quot;DRIVER&quot;, driver);	
+	System.out.println(&quot;Created Driver object successully....&quot;);
+	output.append(&quot;Created Driver object successully....&quot;);
+	SampleResult.setSuccessful(true);
+     SampleResult.setResponseData( output.toString() );
+    	IsSuccess=true;
+
+
+	
+	String xpath = &quot;/steps/step&quot;;
+	XPath XPathObject =  XPathFactory.newInstance().newXPath();
+	NodeList steps = (NodeList) XPathObject.compile(xpath).evaluate(document, XPathConstants.NODESET);
+	vars.put(&quot;NO_OF_SAMPLES&quot;, String.valueOf(steps.getLength()));
+	System.out.println(&quot;No of steps : : &quot; + vars.get(&quot;NO_OF_SAMPLES&quot;) + &quot; \n TestName : : testcases/${__P(xmlScriptFileName)}.xml&quot;);
+
+
+	XPath XPathObject_type =  XPathFactory.newInstance().newXPath();
+	String Xpath_type = &quot;/steps/step[1]&quot;;
+	Node step_type = (Node) XPathObject_type.compile(Xpath_type).evaluate(document, XPathConstants.NODE);
+	String type = step_type.getAttributes().getNamedItem(&quot;type&quot;).getTextContent();
+	vars.put(&quot;TYPE&quot;, type);
+
+
+
+
+	int num = -1;
+		if(type.equalsIgnoreCase(&quot;JAVA&quot;)) {
+			num = 0;
+		}else if(type.equalsIgnoreCase(&quot;SSH-COMMAND&quot;)) {
+			num = 4;
+		}
+
+		vars.put(&quot;SWITCH_VALUE&quot;, String.valueOf(num));
+
+		
+System.out.println(&quot;Type is : : &quot; + type + &quot; .. &quot; + num);
+	vars.put(&quot;STEP_NO&quot;, &quot;1&quot;);
+} catch (FileNotFoundException e) {
+	e.printStackTrace();
+} catch (Exception e) {
+	e.printStackTrace();
+}</stringProp>
+          <stringProp name="BeanShellSampler.filename"></stringProp>
+          <stringProp name="BeanShellSampler.parameters"></stringProp>
+          <boolProp name="BeanShellSampler.resetInterpreter">false</boolProp>
+        </BeanShellSampler>
+        <hashTree/>
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller Based on Number of Steps" enabled="true">
+          <boolProp name="LoopController.continue_forever">true</boolProp>
+          <stringProp name="LoopController.loops">${NO_OF_SAMPLES}</stringProp>
+        </LoopController>
+        <hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Simple Controller for Grouping" enabled="true"/>
+          <hashTree>
+            <BeanShellPreProcessor guiclass="TestBeanGUI" testclass="BeanShellPreProcessor" testname="PreProcessor" enabled="true">
+              <boolProp name="resetInterpreter">false</boolProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="script">import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPath;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+
+System.out.println(&quot;==========Preprocessor for Step Number : : &quot; + vars.get(&quot;STEP_NO&quot;));
+
+Document document = vars.getObject(&quot;XML_DOCUMENT&quot;);
+XPath mainXPathObject =  XPathFactory.newInstance().newXPath();
+String mainXpath = &quot;/steps/step[&quot;+ vars.get(&quot;STEP_NO&quot;) + &quot;]/parameter&quot;;
+NodeList steps = (NodeList) mainXPathObject.compile(mainXpath).evaluate(document, XPathConstants.NODESET);
+
+String JMETER_PROPERTY_NOTATION = &quot;props::&quot;;
+String JMETER_VARIABLE_NOTATION = &quot;$$&quot;;
+String JMETER_VARIABLE_REPLACE_NOTATION = &quot;JMETERREP::&quot;;
+try {
+	for (int i = 0; i &lt; steps.getLength(); i++) {
+		Node parameter = steps.item(i);
+		String name = parameter.getAttributes().getNamedItem(&quot;name&quot;).getTextContent();
+		String value = parameter.getAttributes().getNamedItem(&quot;value&quot;).getTextContent(); 
+		System.out.println(&quot;==========Preprocessor for Step Number name : : &quot; + name + &quot; ..... &quot; + value);
+	
+		if(value != null &amp;&amp; value.startsWith(JMETER_PROPERTY_NOTATION)){
+			String temp = value.replace(JMETER_PROPERTY_NOTATION, &quot;&quot;);
+			value = props.get(temp);
+			System.out.println(&quot;Value &quot; + value + &quot; read from Jmeter property &quot; + temp);
+		} else if(value != null &amp;&amp; value.startsWith(JMETER_VARIABLE_NOTATION)){
+			String temp = value.replace(JMETER_VARIABLE_NOTATION, &quot;&quot;);
+			value = vars.get(temp);
+			System.out.println(&quot;Value &quot; + value + &quot; read from Jmeter Varaiable &quot; + temp);
+		} else if(value != null &amp;&amp; value.startsWith(JMETER_VARIABLE_REPLACE_NOTATION)){
+			String temp = value.replace(JMETER_VARIABLE_REPLACE_NOTATION, &quot;&quot;);
+			System.out.println(&quot;After replace notation : &quot;+temp);			
+			while(temp.contains(JMETER_VARIABLE_NOTATION)){
+				System.out.println(&quot;After replace notation : &quot;+temp);
+				int startIndex = temp.indexOf(JMETER_VARIABLE_NOTATION);
+				int endIndex = temp.indexOf(JMETER_VARIABLE_NOTATION, startIndex+1);
+				String variable = temp.substring(startIndex+2, endIndex); 
+				String varValue =vars.get(variable);
+				if(varValue == null){
+					varValue = &quot;&quot;;
+				}
+				String replaceStr = temp.substring(startIndex,  endIndex+2); 
+				System.out.println(&quot;==========varValue : : &quot; + varValue + &quot; ..replace string... &quot; + replaceStr);
+				
+				temp = temp.replace(replaceStr, varValue);
+				value = temp;
+			}	
+		}
+		
+		vars.put(name, value);
+		System.out.println(&quot;==========Preprocessor for Step Number name after : : &quot; + name + &quot; ..... &quot; + vars.get(name));
+	}
+} catch(Exception e) {
+	e.printStackTrace();
+}
+
+System.out.println(&quot;==========Preprocessor for Step Number ended : : &quot; + vars.get(&quot;STEP_NO&quot;));</stringProp>
+            </BeanShellPreProcessor>
+            <hashTree/>
+            <SwitchController guiclass="SwitchControllerGui" testclass="SwitchController" testname="Switch Controller" enabled="true">
+              <stringProp name="SwitchController.value">${SWITCH_VALUE}</stringProp>
+            </SwitchController>
+            <hashTree>
+              <JavaSampler guiclass="JavaTestSamplerGui" testclass="JavaSampler" testname="PHAT UI Parser" enabled="true">
+                <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="classname">com.automation.framework.PHATXMLDrivenParser</stringProp>
+              </JavaSampler>
+              <hashTree/>
+              <org.apache.jmeter.protocol.ssh.sampler.SSHCommandSampler guiclass="TestBeanGUI" testclass="org.apache.jmeter.protocol.ssh.sampler.SSHCommandSampler" testname="SSH Command" enabled="true">
+                <stringProp name="command">${sshCmd}</stringProp>
+                <stringProp name="connectionTimeout">${sshTimeOut}</stringProp>
+                <stringProp name="hostname">${sshHostName}</stringProp>
+                <stringProp name="passphrase"></stringProp>
+                <stringProp name="password">${sshPasswd}</stringProp>
+                <intProp name="port">22</intProp>
+                <boolProp name="printStdErr">true</boolProp>
+                <stringProp name="sshkeyfile"></stringProp>
+                <boolProp name="useReturnCode">true</boolProp>
+                <stringProp name="username">${sshUserName}</stringProp>
+              </org.apache.jmeter.protocol.ssh.sampler.SSHCommandSampler>
+              <hashTree>
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regular Expression Extractor" enabled="false">
+                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                  <stringProp name="RegexExtractor.refname">${saveSSHResultTo}</stringProp>
+                  <stringProp name="RegexExtractor.regex">(?s)(^.*)</stringProp>
+                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                  <stringProp name="RegexExtractor.default">1</stringProp>
+                  <stringProp name="RegexExtractor.match_number">1</stringProp>
+                  <stringProp name="Sample.scope">all</stringProp>
+                  <stringProp name="Scope.variable">saveSSHResultTo</stringProp>
+                </RegexExtractor>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+            <BeanShellPostProcessor guiclass="TestBeanGUI" testclass="BeanShellPostProcessor" testname="PostProcessor" enabled="true">
+              <boolProp name="resetInterpreter">false</boolProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="script">import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPath;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+System.out.println(&quot;==========Postprocessor for Step Number : : &quot; + vars.get(&quot;STEP_NO&quot;));
+
+try {
+	String step = vars.get(&quot;STEP_NO&quot;);
+	if(step==null){
+		step=&quot;0&quot;;
+	}
+	int step_num = Integer.valueOf(step);
+	vars.put(&quot;STEP_NO&quot;, &quot;&quot;+ ++step_num);
+	System.out.println(&quot;Current Step Number in postprocessor  # : &quot; + step_num);
+
+	String typeVal = vars.get(&quot;TYPE&quot;);
+	if (typeVal.equalsIgnoreCase(&quot;SSH-COMMAND&quot;)) {
+		
+		//String sshOutput = vars.get(&quot;saveSSHResultTo&quot;);
+		String sshOutput = prev.getResponseDataAsString();
+		if (sshOutput != null) {
+		sshOutput = sshOutput.replace(&quot;=== stdin ===&quot;, &quot;&quot;);
+		sshOutput = sshOutput.replace(&quot;=== stderr ===&quot;, &quot;&quot;);
+
+		vars.put(vars.get(&quot;saveSSHResultTo&quot;), sshOutput);
+		System.out.println(&quot;Save SSHResult : &quot; + sshOutput);
+		}	
+	}
+	
+	//==============================================================================================================
+	System.out.println(&quot;STEP Number is : &quot; + ${STEP_NO});
+	System.out.println(&quot;Total Number of SAMPLES : &quot; + ${NO_OF_SAMPLES});
+
+	if(${STEP_NO} &lt; ${NO_OF_SAMPLES} ) {
+		Document document = vars.getObject(&quot;XML_DOCUMENT&quot;);
+		
+		XPath XPathObject_type =  XPathFactory.newInstance().newXPath();
+		String Xpath_type = &quot;/steps/step[&quot;+step_num+&quot;]&quot;;
+		Node step_type = (Node) XPathObject_type.compile(Xpath_type).evaluate(document, XPathConstants.NODE);
+		String type = step_type.getAttributes().getNamedItem(&quot;type&quot;).getTextContent();
+		vars.put(&quot;TYPE&quot;, type);
+		int num = -1;
+		if(type.equalsIgnoreCase(&quot;JAVA&quot;)) {
+			num = 0;
+		} else if(type.equalsIgnoreCase(&quot;SSH-COMMAND&quot;)) {
+			num = 4;
+		}
+		
+		vars.put(&quot;SWITCH_VALUE&quot;, String.valueOf(num));
+		System.out.println(&quot;Type in preprocessor #  : &quot; + type + &quot; .. &quot; + num);
+	}
+} catch(Exception e) {
+	e.printStackTrace();
+}</stringProp>
+            </BeanShellPostProcessor>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown Thread Group" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <longProp name="ThreadGroup.start_time">1437749564000</longProp>
+        <longProp name="ThreadGroup.end_time">1437749564000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </PostThreadGroup>
+      <hashTree>
+        <BeanShellSampler guiclass="BeanShellSamplerGui" testclass="BeanShellSampler" testname="Finalizer" enabled="true">
+          <stringProp name="BeanShellSampler.query">import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.WebDriver;
+
+try {
+	WebDriver driver = (WebDriver) props.get(&quot;DRIVER&quot;);
+	if(driver!=null){
+		driver.quit();
+	}
+} catch (Exception e){
+	e.printStackTrace();
+}
+</stringProp>
+          <stringProp name="BeanShellSampler.filename"></stringProp>
+          <stringProp name="BeanShellSampler.parameters"></stringProp>
+          <boolProp name="BeanShellSampler.resetInterpreter">false</boolProp>
+        </BeanShellSampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
